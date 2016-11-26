@@ -12,91 +12,98 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="lv.edi.lv.mood_muki.MainActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:orientation="horizontal">-->
 
-        <!--<EditText-->
-            <!--android:id="@+id/serailNumberText"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:inputType="number"-->
-            <!--android:hint="Enter serial"/>-->
+        <!--&lt;!&ndash;<EditText&ndash;&gt;-->
+            <!--&lt;!&ndash;android:id="@+id/serailNumberText"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_width="0dp"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_weight="1"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:inputType="number"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:hint="Enter serial"/>&ndash;&gt;-->
 
-        <!--<Button-->
-            <!--android:layout_width="100dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:onClick="request"-->
-            <!--android:text="Request"/>-->
-    </LinearLayout>
+        <!--&lt;!&ndash;<Button&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_width="100dp"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:onClick="request"&ndash;&gt;-->
+            <!--&lt;!&ndash;android:text="Request"/>&ndash;&gt;-->
+    <!--</LinearLayout>-->
 
-    <TextView
-        android:id="@+id/cupIdText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="No Cup Id"/>
+    <!--<TextView-->
+        <!--android:id="@+id/cupIdText"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:hint="No Cup Id"/>-->
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="deviceInfo"
-        android:text="Device info"/>
-
-    <TextView
-        android:id="@+id/deviceInfoText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:onClick="send"
+        android:text="Send"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="Contrast"/>
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:onClick="deviceInfo"-->
+        <!--android:text="Device info"/>-->
 
-    <SeekBar
-        android:id="@+id/contrastSeekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:max="200"/>
+    <!--<TextView-->
+        <!--android:id="@+id/deviceInfoText"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--/>-->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:orientation="horizontal">
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="@dimen/activity_vertical_margin"-->
+        <!--android:text="Contrast"/>-->
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="crop"
-            android:text="Crop"/>
+    <!--<SeekBar-->
+        <!--android:id="@+id/contrastSeekBar"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:max="200"/>-->
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="reset"
-            android:text="Reset"/>
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="@dimen/activity_vertical_margin"-->
+        <!--android:orientation="horizontal">-->
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="send"
-            android:text="Send"/>
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="crop"-->
+            <!--android:text="Crop"/>-->
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="clear"
-            android:text="Clear"/>
-    </LinearLayout>
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="reset"-->
+            <!--android:text="Reset"/>-->
+
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="send"-->
+            <!--android:text="Send"/>-->
+
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="clear"-->
+            <!--android:text="Clear"/>-->
+    <!--</LinearLayout>-->
 
 
     <ImageView
         android:id="@+id/imageSrc"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
 </LinearLayout>

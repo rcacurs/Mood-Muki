@@ -31,6 +31,10 @@ import com.muki.core.model.ErrorCode;
 import com.muki.core.model.ImageProperties;
 import com.muki.core.util.ImageUtils;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Vector;
+
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "mood-muki activity";
     private EditText mSerialNumberEdit;
@@ -42,10 +46,17 @@ public class MainActivity extends AppCompatActivity {
 
     private Bitmap mImage;
     private Bitmap b; // bitmap generated with our content
+    private Bitmap coffeMugBM;
+    private Bitmap excerciseBM;
+    private Bitmap greatBM;
+    private Bitmap sleepyBM;
+    private Bitmap greatInvBM;
+    private Bitmap dangerBM;
     private int mContrast = ImageProperties.DEFAULT_CONTRACT;
 
     private String mCupId="PAULIG_MUKI_3C1DF1";
     private MoodApplication app;
+    private Timer timer;
 
     int SIZEX=176, SIZEY = 264;
 
@@ -66,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         app.mMukiCupApi = new MukiCupApi(getApplicationContext(), new MukiCupCallback() {
             @Override
             public void onCupConnected() {
-                showToast("Cup connected");
+                //showToast("Cup connected");
             }
 
             @Override
@@ -92,49 +103,101 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(Action action, ErrorCode errorCode) {
-                showToast("Error:" + errorCode + " on action:" + action);
+                //showToast("Error:" + errorCode + " on action:" + action);
             }
         });
 
         //mSerialNumberEdit = (EditText) findViewById(R.id.serailNumberText);
-        mCupIdText = (TextView) findViewById(R.id.cupIdText);
-        mDeviceInfoText = (TextView) findViewById(R.id.deviceInfoText);
+        //mCupIdText = (TextView) findViewById(R.id.cupIdText);
+        //mDeviceInfoText = (TextView) findViewById(R.id.deviceInfoText);
         mCupImage = (ImageView) findViewById(R.id.imageSrc);
-        mContrastSeekBar = (SeekBar) findViewById(R.id.contrastSeekBar);
-        mContrastSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mContrast = i - 100;
-                showProgress();
-                //setupImage();
-            }
+        //mContrastSeekBar = (SeekBar) findViewById(R.id.contrastSeekBar);
+//        mContrastSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                mContrast = i - 100;
+//                showProgress();
+//                //setupImage();
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//        });
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+        //reset(null);
 
-            }
+        // get coffe mug bitmap
+        coffeMugBM = BitmapFactory.decodeResource(getResources(), R.drawable.coffe_cup);
+        coffeMugBM = Bitmap.createScaledBitmap (coffeMugBM, 30, 30, true);
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+        excerciseBM = BitmapFactory.decodeResource(getResources(), R.drawable.exercise);
+        excerciseBM = Bitmap.createScaledBitmap (excerciseBM, 30, 30, true);
 
-            }
-        });
+        greatBM = BitmapFactory.decodeResource(getResources(), R.drawable.great);
+        greatBM = Bitmap.createScaledBitmap (greatBM, 30, 30, true);
 
-        reset(null);
+        greatInvBM = BitmapFactory.decodeResource(getResources(), R.drawable.greatn);
+        greatInvBM = Bitmap.createScaledBitmap (greatInvBM, 30, 30, true);
+
+        sleepyBM = BitmapFactory.decodeResource(getResources(), R.drawable.sleepy);
+        sleepyBM = Bitmap.createScaledBitmap (sleepyBM, 30, 30, false);
+
+        dangerBM = BitmapFactory.decodeResource(getResources(), R.drawable.dangern);
+        dangerBM = Bitmap.createScaledBitmap (dangerBM, 30, 30, false);
 
         b =  Bitmap.createBitmap(SIZEX, SIZEY, Bitmap.Config.ARGB_8888);
         mCupImage.setImageBitmap(b);
 
-        updateScreen(new SleepState("one", "two"));
+
+        timer = new Timer();
+
+
+        timer.scheduleAtFixedRate(new TimerTask(){
+            int ind = 0;
+
+            final Vector<SleepState> states = SleepState.getAllStates();
+            public void run(){
+                Log.d(TAG, "TIMER TASK");
+
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        updateScreen(states.get(ind));
+                    }
+                });
+
+                ind++;
+                if (ind == states.size()) ind=0;
+
+            }
+        }, 0, 15000);
+
+
+
 
 
 
     }
 
     @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        if(timer!=null){
+            timer.cancel();
+
+        }
+    }
+
+    @Override
     protected void onResume(){
         super.onResume();
-        mCupIdText.setText(mCupId);
+        //mCupIdText.setText(mCupId);
     }
 
     private void setupImage() {
@@ -170,13 +233,14 @@ public class MainActivity extends AppCompatActivity {
 
         mImage = ImageUtils.scaleBitmapToCupSize(image);
         mContrast = ImageProperties.DEFAULT_CONTRACT;
-        mContrastSeekBar.setProgress(100);
+        //
+        // mContrastSeekBar.setProgress(100);
         setupImage();
         image.recycle();
     }
 
     public void send(View view) {
-        showProgress();
+        //showProgress();
         app.mMukiCupApi.sendImage(b, new ImageProperties(mContrast), mCupId);
     }
 
@@ -255,23 +319,95 @@ public class MainActivity extends AppCompatActivity {
         b =  Bitmap.createBitmap(SIZEX, SIZEY, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(b);
         canvas.drawColor(Color.WHITE);
-        Paint textPaint = new Paint();
-        Paint textPaint2 = new Paint();
-        Paint textPaint3 = new Paint();
 
+        // paint readiness
+        Paint textPaint = new Paint();
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(30.0f);
+        canvas.drawText(sleepState.getSleepStateMessage(), 10, 35, textPaint);
 
+        // draw restness level via cup count
+        if(sleepState.currentReadiness.equals(SleepState.HARD_DAY)) {
+            canvas.drawBitmap(coffeMugBM, 40, 40, null);
+            canvas.drawBitmap(coffeMugBM, 70, 40, null);
+            canvas.drawBitmap(coffeMugBM, 100, 40, null);
+        }
+
+        if(sleepState.currentReadiness.equals(SleepState.TIRED)) {
+            canvas.drawBitmap(coffeMugBM, 55, 40, null);
+            canvas.drawBitmap(coffeMugBM, 85, 40, null);
+        }
+
+        if(sleepState.currentReadiness.equals(SleepState.FRESH)) {
+            canvas.drawBitmap(coffeMugBM, 70, 40, null);
+        }
+
+        if(sleepState.currentReadiness.equals(SleepState.READY)){
+            canvas.drawBitmap(greatBM, 70, 40, null);
+        }
+
+        if(sleepState.currentReadiness.equals(SleepState.NOT_SLEPT)){
+            canvas.drawBitmap(sleepyBM, 70, 40, null);
+        }
+
+        // draw advice text
+        Paint textPaint2 = new Paint();
         textPaint2.setColor(Color.BLACK);
-        textPaint2.setTextSize(20.0f);
-        //textPaint2.setTypeface(Typeface.create((Typeface)null, Typeface.BOLD_ITALIC));
+        textPaint2.setTypeface(Typeface.create((Typeface)null, Typeface.BOLD));
+        textPaint2.setTextSize(16.0f);
+        String[] advice1 = sleepState.getSleepStateAdvice();
+        canvas.drawText(advice1[0], 10,  85, textPaint2);
+        canvas.drawText(advice1[1], 10, 103, textPaint2);
+        canvas.drawText(advice1[2], 10, 121, textPaint2);
 
-        textPaint3.setColor(Color.BLACK);
-        textPaint3.setTextSize(10.0f);
 
-        canvas.drawText("Works", 10, SIZEY/2, textPaint);
-        canvas.drawText("Works2", 10, SIZEY/2 +20, textPaint2);
-        canvas.drawText("Works3", 10, SIZEY/2 +40, textPaint3);
+        // draw lower section background
+        Paint backgroundPaint = new Paint();
+        backgroundPaint.setColor(Color.BLACK);
+        backgroundPaint.setStyle(Paint.Style.FILL);
+        canvas.drawRect(0 , SIZEY/2, SIZEX, SIZEY, backgroundPaint);
+
+        // fill lower section
+        // activity state
+
+        Paint textPaint3 = new Paint();
+        textPaint3.setColor(Color.WHITE);
+        textPaint3.setTextSize(30.0f);
+        canvas.drawText(sleepState.getActivityMessage(), 10, SIZEY/2+5+30, textPaint3);
+
+        // paint excercise icons
+
+        if(sleepState.currentActivity.equals(SleepState.BALANCED)){
+            canvas.drawBitmap(greatInvBM, 70, SIZEY/2 + 40, null);
+        }
+
+        if(sleepState.currentActivity.equals(SleepState.INACTIVE)){
+            canvas.drawBitmap(excerciseBM, 70, SIZEY/2 + 40, null);
+        }
+
+        if(sleepState.currentActivity.equals(SleepState.STRESSED)){
+            canvas.drawBitmap(dangerBM, 70, SIZEY/2 + 40, null);
+        }
+        // draw restness level via cup count
+//
+//        canvas.drawBitmap(excerciseBM, 40, SIZEY/2 + 40, null);
+//        canvas.drawBitmap(excerciseBM, 70, SIZEY/2 + 40, null);
+
+        // draw advice
+        Paint textPaint4 = new Paint();
+        textPaint4.setColor(Color.WHITE);
+        textPaint4.setTypeface(Typeface.create((Typeface)null, Typeface.BOLD));
+        textPaint4.setTextSize(16.0f);
+        String[] advice2 = sleepState.getActivityAdvice();
+        canvas.drawText(advice2[0], 10,  SIZEY/2 + 85, textPaint4);
+        canvas.drawText(advice2[1], 10, SIZEY/2 + 103, textPaint4);
+        canvas.drawText(advice2[2], 10, SIZEY/2 + 121, textPaint4);
+
+
+//        textPaint2.setColor(Color.BLACK);
+//        textPaint2.setTextSize(20.0f);
+        //textPaint2.setTypeface(Typeface.create((Typeface)null, Typeface.BOLD_ITALIC))
+
         mCupImage.setImageBitmap(b);
         app.mMukiCupApi.sendImage(b, new ImageProperties(mContrast), mCupId);
     }
