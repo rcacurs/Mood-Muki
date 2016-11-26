@@ -1,13 +1,21 @@
 package lv.edi.lv.mood_muki;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,7 +32,7 @@ import com.muki.core.model.ImageProperties;
 import com.muki.core.util.ImageUtils;
 
 public class MainActivity extends AppCompatActivity {
-
+    private final String TAG = "mood-muki activity";
     private EditText mSerialNumberEdit;
     private TextView mCupIdText;
     private TextView mDeviceInfoText;
@@ -33,22 +41,29 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
 
     private Bitmap mImage;
+    private Bitmap b; // bitmap generated with our content
     private int mContrast = ImageProperties.DEFAULT_CONTRACT;
 
-    private String mCupId;
-    private MukiCupApi mMukiCupApi;
+    private String mCupId="PAULIG_MUKI_3C1DF1";
+    private MoodApplication app;
+
+    int SIZEX=176, SIZEY = 264;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        app = (MoodApplication) getApplication();
+        app.mainActivity = this;
+
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setCancelable(false);
         mProgressDialog.setMessage("Loading. Please wait...");
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
-        mMukiCupApi = new MukiCupApi(getApplicationContext(), new MukiCupCallback() {
+        app.mMukiCupApi = new MukiCupApi(getApplicationContext(), new MukiCupCallback() {
             @Override
             public void onCupConnected() {
                 showToast("Cup connected");
@@ -81,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mSerialNumberEdit = (EditText) findViewById(R.id.serailNumberText);
+        //mSerialNumberEdit = (EditText) findViewById(R.id.serailNumberText);
         mCupIdText = (TextView) findViewById(R.id.cupIdText);
         mDeviceInfoText = (TextView) findViewById(R.id.deviceInfoText);
         mCupImage = (ImageView) findViewById(R.id.imageSrc);
@@ -91,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 mContrast = i - 100;
                 showProgress();
-                setupImage();
+                //setupImage();
             }
 
             @Override
@@ -106,20 +121,34 @@ public class MainActivity extends AppCompatActivity {
         });
 
         reset(null);
+
+        b =  Bitmap.createBitmap(SIZEX, SIZEY, Bitmap.Config.ARGB_8888);
+        mCupImage.setImageBitmap(b);
+
+        updateScreen(new SleepState("one", "two"));
+
+
+
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        mCupIdText.setText(mCupId);
     }
 
     private void setupImage() {
         new AsyncTask<Void, Void, Bitmap>() {
             @Override
             protected Bitmap doInBackground(Void... voids) {
-                Bitmap result = Bitmap.createBitmap(mImage);
+                Bitmap result = Bitmap.createBitmap(b);
                 ImageUtils.convertImageToCupImage(result, mContrast);
                 return result;
             }
 
             @Override
             protected void onPostExecute(Bitmap bitmap) {
-                mCupImage.setImageBitmap(bitmap);
+                //mCupImage.setImageBitmap(bitmap);
                 hideProgress();
             }
         }.execute();
@@ -136,6 +165,9 @@ public class MainActivity extends AppCompatActivity {
     public void reset(View view) {
         showProgress();
         Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.test_image);
+
+        Log.d(TAG, "bitmap config: "+image.getConfig());
+
         mImage = ImageUtils.scaleBitmapToCupSize(image);
         mContrast = ImageProperties.DEFAULT_CONTRACT;
         mContrastSeekBar.setProgress(100);
@@ -145,16 +177,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void send(View view) {
         showProgress();
-        mMukiCupApi.sendImage(mImage, new ImageProperties(mContrast), mCupId);
+        app.mMukiCupApi.sendImage(b, new ImageProperties(mContrast), mCupId);
     }
 
     public void clear(View view) {
         showProgress();
-        mMukiCupApi.clearImage(mCupId);
+        app.mMukiCupApi.clearImage(mCupId);
     }
 
-    public void request(View view) {
-        String serialNumber = mSerialNumberEdit.getText().toString();
+    public void request() {
+        Log.d(TAG, "request cup id");
+        //String serialNumber = mSerialNumberEdit.getText().toString();
         showProgress();
         new AsyncTask<String, Void, String>() {
             @Override
@@ -171,15 +204,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String s) {
                 mCupId = s;
+                Log.d(TAG, "Obtained cub ID: "+mCupId);
                 mCupIdText.setText(mCupId);
                 hideProgress();
             }
-        }.execute(serialNumber);
+        }.execute(app.mukiCode);
     }
 
     public void deviceInfo(View view) {
         showProgress();
-        mMukiCupApi.getDeviceInfo(mCupId);
+        app.mMukiCupApi.getDeviceInfo(mCupId);
     }
 
     private void showToast(final String text) {
@@ -193,5 +227,52 @@ public class MainActivity extends AppCompatActivity {
 
     private void hideProgress() {
         mProgressDialog.dismiss();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void updateScreen(SleepState sleepState){
+        // drawing own bitmap
+
+        b =  Bitmap.createBitmap(SIZEX, SIZEY, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(b);
+        canvas.drawColor(Color.WHITE);
+        Paint textPaint = new Paint();
+        Paint textPaint2 = new Paint();
+        Paint textPaint3 = new Paint();
+
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextSize(30.0f);
+
+        textPaint2.setColor(Color.BLACK);
+        textPaint2.setTextSize(20.0f);
+        //textPaint2.setTypeface(Typeface.create((Typeface)null, Typeface.BOLD_ITALIC));
+
+        textPaint3.setColor(Color.BLACK);
+        textPaint3.setTextSize(10.0f);
+
+        canvas.drawText("Works", 10, SIZEY/2, textPaint);
+        canvas.drawText("Works2", 10, SIZEY/2 +20, textPaint2);
+        canvas.drawText("Works3", 10, SIZEY/2 +40, textPaint3);
+        mCupImage.setImageBitmap(b);
+        app.mMukiCupApi.sendImage(b, new ImageProperties(mContrast), mCupId);
     }
 }

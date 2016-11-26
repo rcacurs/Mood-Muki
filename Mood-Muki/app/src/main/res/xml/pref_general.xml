@@ -1,0 +1,11 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_string_mug_default"
+        android:inputType="textCapWords"
+        android:key="setting_mug_code"
+        android:title="@string/pref_title_mug_code"
+        android:hint="@string/pref_hint_mug_code"/>
+
+
+</PreferenceScreen>
