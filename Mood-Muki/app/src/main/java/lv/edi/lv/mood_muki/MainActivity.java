@@ -31,6 +31,10 @@ import com.muki.core.model.ErrorCode;
 import com.muki.core.model.ImageProperties;
 import com.muki.core.util.ImageUtils;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -160,20 +164,39 @@ public class MainActivity extends AppCompatActivity {
 
 
         timer.scheduleAtFixedRate(new TimerTask(){
-            int ind = 0;
 
             final Vector<SleepState> states = SleepState.getAllStates();
+            String inputLine;
+            String response;
             public void run(){
                 Log.d(TAG, "TIMER TASK");
+                try {
+                    URL yahoo = new URL("http://zzzyield.azurewebsites.net/state.php");
+                    URLConnection yc = yahoo.openConnection();
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(
+                                    yc.getInputStream()));
 
+                    while ((inputLine = in.readLine()) != null){
+                        response = new String(inputLine);
+                        Log.d(TAG, "response line " + inputLine);
+
+
+
+                    }
+                    Log.d(TAG, "http closed!");
+                        in.close();
+                } catch(Exception ex){
+                    Log.d(TAG, "Network exception");
+                }
+                Log.d(TAG, "input line "+inputLine);
                 MainActivity.this.runOnUiThread(new Runnable() {
                     public void run() {
-                        updateScreen(states.get(ind));
+                        SleepState state = new SleepState(response);
+                        updateScreen(state);
                     }
                 });
 
-                ind++;
-                if (ind == states.size()) ind=0;
 
             }
         }, 0, 15000);

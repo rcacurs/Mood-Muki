@@ -30,6 +30,29 @@ public class SleepState {
         this.currentActivity = currentActivity;
     }
 
+    public SleepState(String httpResponse){
+        String[] values = httpResponse.split(" ");
+        if(values.length == 3){
+            int person = Integer.parseInt(values[0]);
+            int readiness = Integer.parseInt(values[1]);
+            int activity = Integer.parseInt(values[2]);
+
+            if(readiness==0) currentReadiness = READY;
+            if(readiness==1) currentReadiness = FRESH;
+            if(readiness==2) currentReadiness = TIRED;
+            if(readiness==3) currentReadiness = HARD_DAY;
+            if(readiness==4) currentReadiness = NOT_SLEPT;
+
+            if(activity==0) currentActivity = BALANCED;
+            if(activity==1) currentActivity = INACTIVE;
+            if(activity==2) currentActivity = STRESSED;
+        } else{
+            this.currentReadiness = NO_DATA;
+            this.currentActivity = NO_DATA;
+        }
+
+    }
+
     public String getSleepStateMessage(){
 
         if(currentReadiness.equals(SleepState.READY)){
