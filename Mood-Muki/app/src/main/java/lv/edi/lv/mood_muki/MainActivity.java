@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
     int SIZEX=176, SIZEY = 264;
 
+    SleepState previous = new SleepState();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
             final Vector<SleepState> states = SleepState.getAllStates();
             String inputLine;
             String response;
-            SleepState previous = new SleepState();
+
             public void run(){
                 Log.d(TAG, "TIMER TASK");
                 try {
@@ -263,7 +265,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void send(View view) {
         //showProgress();
-        app.mMukiCupApi.sendImage(b, new ImageProperties(mContrast), mCupId);
+        //app.mMukiCupApi.sendImage(b, new ImageProperties(mContrast), mCupId);
+        updateScreen(previous);
     }
 
     public void clear(View view) {
@@ -298,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void deviceInfo(View view) {
-        showProgress();
+        //showProgress();
         app.mMukiCupApi.getDeviceInfo(mCupId);
     }
 
