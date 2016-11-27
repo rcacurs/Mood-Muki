@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
             final Vector<SleepState> states = SleepState.getAllStates();
             String inputLine;
             String response;
+            SleepState previous = new SleepState();
             public void run(){
                 Log.d(TAG, "TIMER TASK");
                 try {
@@ -193,18 +194,16 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.runOnUiThread(new Runnable() {
                     public void run() {
                         SleepState state = new SleepState(response);
-                        updateScreen(state);
+                        if(!state.equal(previous)){
+                            updateScreen(state);
+                            previous = new SleepState(state);
+                        }
                     }
                 });
 
 
             }
-        }, 0, 15000);
-
-
-
-
-
+        }, 0, 1000);
 
     }
 

@@ -30,6 +30,10 @@ public class SleepState {
         this.currentActivity = currentActivity;
     }
 
+    public SleepState(SleepState src){
+        this(src.currentReadiness, src.currentActivity);
+    }
+
     public SleepState(String httpResponse){
         String[] values = httpResponse.split(" ");
         if(values.length == 3){
@@ -192,5 +196,13 @@ public class SleepState {
         states.add(new SleepState(SleepState.NOT_SLEPT, SleepState.INACTIVE));
         states.add(new SleepState(SleepState.NOT_SLEPT, SleepState.STRESSED));
         return states;
+    }
+
+    public boolean equal(SleepState sleepState){
+        if(sleepState.currentReadiness.equals(this.currentReadiness) && sleepState.currentActivity.equals(this.currentActivity)){
+            return true;
+        } else{
+            return false;
+        }
     }
 }
